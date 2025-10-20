@@ -17,4 +17,8 @@ public class RecipeService {
     public List<Recipe> getAllRecipes() {
         return recipeJdbcRepository.getAllRecipes();
     }
+
+    public Recipe getRecipeById(int id) {
+        return recipeJdbcRepository.getRecipeById(id);
+    }
 }
