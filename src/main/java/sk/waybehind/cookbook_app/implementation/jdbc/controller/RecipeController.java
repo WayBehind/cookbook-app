@@ -1,10 +1,9 @@
 package sk.waybehind.cookbook_app.implementation.jdbc.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import sk.waybehind.cookbook_app.api.request.CreateRecipeRequest;
 import sk.waybehind.cookbook_app.domain.Recipe;
 import sk.waybehind.cookbook_app.implementation.jdbc.service.RecipeService;
 
@@ -27,5 +26,10 @@ public class RecipeController {
     @GetMapping("{id}")
     public ResponseEntity<Recipe> getRecipeById(@PathVariable int id) {
         return ResponseEntity.ok(recipeService.getRecipeById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<Recipe> createRecipe(@RequestBody CreateRecipeRequest recipeRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.createRecipe(recipeRequest));
     }
 }

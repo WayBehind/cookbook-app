@@ -4,11 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import sk.waybehind.cookbook_app.api.exception.InternalErrorException;
 import sk.waybehind.cookbook_app.api.exception.RecipeNotFoundException;
 import sk.waybehind.cookbook_app.domain.Recipe;
 import sk.waybehind.cookbook_app.implementation.jdbc.mapper.RecipeRowMapper;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -17,6 +22,7 @@ public class RecipeJdbcRepository {
 
     private static final String GET_ALL = "SELECT * FROM recipe";
     private static final String GET_BY_ID = "SELECT * FROM recipe WHERE id = ?";
+    private static final String CREATE_RECIPE = "INSERT INTO recipe (title, description, prep_time_minutes) VALUES (?, ?, ?)";
 
     private final JdbcTemplate jdbcTemplate;
     private final RecipeRowMapper recipeRowMapper;
@@ -41,5 +47,32 @@ public class RecipeJdbcRepository {
             logger.error("Recipe with id {} not foud", id);
             throw new RecipeNotFoundException("Recipe with id: " + id + " was not found");
         }
+    }
+
+    public Recipe createRecipe(String title, String description, Integer prepTimeMinutes) {
+        logger.debug("Creating new recipe with title: {}", title);
+
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            final PreparedStatement preparedStatement = con.prepareStatement(CREATE_RECIPE, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, title);
+            preparedStatement.setString(2, description);
+            if (prepTimeMinutes == null) {
+                preparedStatement.setObject(3, null);
+            } else {
+                preparedStatement.setInt(3, prepTimeMinutes);
+            }
+
+            return preparedStatement;
+        }, keyHolder);
+
+        if (keyHolder.getKeys() == null) {
+            logger.error("KeyHolder wal null while creating new recipe");
+            throw new InternalErrorException("Error while creating recipe");
+        }
+
+        final Number id = (Number) keyHolder.getKeys().get("ID");
+        return this.getRecipeById(id.intValue());
     }
 }
