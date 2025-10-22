@@ -32,4 +32,11 @@ public class RecipeController {
     public ResponseEntity<Recipe> createRecipe(@RequestBody CreateRecipeRequest recipeRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.createRecipe(recipeRequest));
     }
+
+    @PostMapping("{id}")
+    public ResponseEntity<Recipe> updateRecipe(
+            @PathVariable int id,
+            @RequestBody CreateRecipeRequest recipeRequest) {
+        return ResponseEntity.ok(recipeService.updateRecipe(id, recipeRequest));
+    }
 }

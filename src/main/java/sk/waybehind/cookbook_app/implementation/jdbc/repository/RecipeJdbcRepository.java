@@ -23,6 +23,7 @@ public class RecipeJdbcRepository {
     private static final String GET_ALL = "SELECT * FROM recipe";
     private static final String GET_BY_ID = "SELECT * FROM recipe WHERE id = ?";
     private static final String CREATE_RECIPE = "INSERT INTO recipe (title, description, prep_time_minutes) VALUES (?, ?, ?)";
+    private static final String UPDATE = "UPDATE recipe SET title = ?, description = ?, prep_time_minutes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final RecipeRowMapper recipeRowMapper;
@@ -68,11 +69,19 @@ public class RecipeJdbcRepository {
         }, keyHolder);
 
         if (keyHolder.getKeys() == null) {
-            logger.error("KeyHolder wal null while creating new recipe");
+            logger.error("KeyHolder was null while creating new recipe");
             throw new InternalErrorException("Error while creating recipe");
         }
 
         final Number id = (Number) keyHolder.getKeys().get("ID");
         return this.getRecipeById(id.intValue());
+    }
+
+    public void updateRecipe(String title, String description, Integer prepTimeMinutes, int id) {
+        logger.debug("Updating recipe with id: {}", id);
+
+        getRecipeById(id);
+
+        jdbcTemplate.update(UPDATE, title, description, prepTimeMinutes, id);
     }
 }

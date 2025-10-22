@@ -29,6 +29,16 @@ public class RecipeService {
                 recipeRequest.getDescription(),
                 recipeRequest.getPrepTimeMinutes()
         );
+    }
 
+    public Recipe updateRecipe(int id, CreateRecipeRequest recipeRequest) {
+        recipeJdbcRepository.updateRecipe(
+                recipeRequest.getTitle(),
+                recipeRequest.getDescription(),
+                recipeRequest.getPrepTimeMinutes(),
+                id
+        );
+
+        return recipeJdbcRepository.getRecipeById(id);
     }
 }
