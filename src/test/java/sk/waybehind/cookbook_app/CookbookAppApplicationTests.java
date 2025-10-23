@@ -25,7 +25,7 @@ class CookbookAppApplicationTests {
 
     @Test
     void getAll() {
-        final ResponseEntity<List<Recipe>> responseEntity = testRestTemplate.exchange(
+        final ResponseEntity<List<Recipe>> response = testRestTemplate.exchange(
                 "/api/recipes",
                 HttpMethod.GET,
                 null,
@@ -33,9 +33,9 @@ class CookbookAppApplicationTests {
                 }
         );
 
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertNotNull(responseEntity.getBody());
-        assertTrue(responseEntity.getBody().size() >= 2);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().size() >= 2);
 
     }
 
@@ -110,7 +110,7 @@ class CookbookAppApplicationTests {
 
         final ResponseEntity<RecipeNotFoundException> response = testRestTemplate.exchange(
                 "/api/recipes/999",
-                HttpMethod.POST,
+                HttpMethod.PUT,
                 new HttpEntity<>(request),
                 RecipeNotFoundException.class
         );
@@ -128,7 +128,7 @@ class CookbookAppApplicationTests {
 
         final ResponseEntity<Recipe> response = testRestTemplate.exchange(
                 "/api/recipes/1",
-                HttpMethod.POST,
+                HttpMethod.PUT,
                 new HttpEntity<>(request),
                 Recipe.class
         );
@@ -138,7 +138,56 @@ class CookbookAppApplicationTests {
         assertEquals(request.getTitle(), response.getBody().getTitle());
         assertEquals(request.getDescription(), response.getBody().getDescription());
         assertEquals(request.getPrepTimeMinutes(), response.getBody().getPrepTimeMinutes());
+    }
 
+    @Test
+    void deleteRecipe() {
+        final CreateRecipeRequest request = new CreateRecipeRequest(
+                "Recipe to delete",
+                "Recipe to delete",
+                22
+        );
 
+        final ResponseEntity<Recipe> response = testRestTemplate.postForEntity(
+                "/api/recipes",
+                request,
+                Recipe.class
+        );
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        final Recipe createdRecipe = response.getBody();
+
+        final ResponseEntity<Void> deletionResponse = testRestTemplate.exchange(
+                "/api/recipes/" + createdRecipe.getId(),
+                HttpMethod.DELETE,
+                null,
+                Void.class
+
+        );
+
+        assertEquals(HttpStatus.OK, deletionResponse.getStatusCode());
+
+        final ResponseEntity<RecipeNotFoundException> getResponse = testRestTemplate.exchange(
+                "/api/recipes/" + createdRecipe.getId(),
+                HttpMethod.GET,
+                null,
+                RecipeNotFoundException.class
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, getResponse.getStatusCode());
+    }
+
+    @Test
+    void deleteNonexistentRecipe() {
+        final ResponseEntity<RecipeNotFoundException> response = testRestTemplate.exchange(
+                "/api/recipes/999",
+                HttpMethod.DELETE,
+                new HttpEntity<>(null),
+                RecipeNotFoundException.class
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }

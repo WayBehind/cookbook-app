@@ -41,4 +41,8 @@ public class RecipeService {
 
         return recipeJdbcRepository.getRecipeById(id);
     }
+
+    public void deleteRecipe(int id) {
+        recipeJdbcRepository.deleteRecipe(id);
+    }
 }

@@ -22,8 +22,9 @@ public class RecipeJdbcRepository {
 
     private static final String GET_ALL = "SELECT * FROM recipe";
     private static final String GET_BY_ID = "SELECT * FROM recipe WHERE id = ?";
-    private static final String CREATE_RECIPE = "INSERT INTO recipe (title, description, prep_time_minutes) VALUES (?, ?, ?)";
+    private static final String CREATE = "INSERT INTO recipe (title, description, prep_time_minutes) VALUES (?, ?, ?)";
     private static final String UPDATE = "UPDATE recipe SET title = ?, description = ?, prep_time_minutes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+    private static final String DELETE =  "DELETE FROM recipe WHERE id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final RecipeRowMapper recipeRowMapper;
@@ -56,7 +57,7 @@ public class RecipeJdbcRepository {
         final KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(con -> {
-            final PreparedStatement preparedStatement = con.prepareStatement(CREATE_RECIPE, Statement.RETURN_GENERATED_KEYS);
+            final PreparedStatement preparedStatement = con.prepareStatement(CREATE, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, title);
             preparedStatement.setString(2, description);
             if (prepTimeMinutes == null) {
@@ -83,5 +84,13 @@ public class RecipeJdbcRepository {
         getRecipeById(id);
 
         jdbcTemplate.update(UPDATE, title, description, prepTimeMinutes, id);
+    }
+
+    public void deleteRecipe(int id) {
+        logger.debug("Deleting recipe with id: {}", id);
+
+        getRecipeById(id);
+
+        jdbcTemplate.update(DELETE, id);
     }
 }
