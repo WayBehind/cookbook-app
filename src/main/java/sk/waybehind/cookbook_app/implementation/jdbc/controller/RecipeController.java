@@ -28,6 +28,13 @@ public class RecipeController {
         return ResponseEntity.ok(recipeService.getRecipeById(id));
     }
 
+    @GetMapping
+    public ResponseEntity<List<Recipe>> getRecipeByTitle(
+            @RequestParam(required = false, defaultValue = "") String searchText
+    ) {
+        return ResponseEntity.ok(recipeService.getRecipeByTitle(searchText));
+    }
+
     @PostMapping
     public ResponseEntity<Recipe> createRecipe(@RequestBody CreateRecipeRequest recipeRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(recipeService.createRecipe(recipeRequest));

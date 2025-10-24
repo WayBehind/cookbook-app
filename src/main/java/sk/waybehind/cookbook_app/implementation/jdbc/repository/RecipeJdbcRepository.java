@@ -21,10 +21,11 @@ public class RecipeJdbcRepository {
     private static final Logger logger = LoggerFactory.getLogger(RecipeJdbcRepository.class);
 
     private static final String GET_ALL = "SELECT * FROM recipe";
+    private static final String GET_BY_TITLE = "SELECT * FROM recipe WHERE LOWER(title) LIKE LOWER(?) ORDER BY created_at DESC";
     private static final String GET_BY_ID = "SELECT * FROM recipe WHERE id = ?";
     private static final String CREATE = "INSERT INTO recipe (title, description, prep_time_minutes) VALUES (?, ?, ?)";
     private static final String UPDATE = "UPDATE recipe SET title = ?, description = ?, prep_time_minutes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
-    private static final String DELETE =  "DELETE FROM recipe WHERE id = ?";
+    private static final String DELETE = "DELETE FROM recipe WHERE id = ?";
 
     private final JdbcTemplate jdbcTemplate;
     private final RecipeRowMapper recipeRowMapper;
@@ -37,6 +38,12 @@ public class RecipeJdbcRepository {
     public List<Recipe> getAllRecipes() {
         logger.debug("Getting all recipes");
         return jdbcTemplate.query(GET_ALL, recipeRowMapper);
+
+    }
+
+    public List<Recipe> getRecipeByTitle(String searchText) {
+        logger.debug("Getting recipes with title: {}", searchText);
+        return jdbcTemplate.query(GET_BY_TITLE, recipeRowMapper, "%" + searchText + "%");
 
     }
 

@@ -19,6 +19,10 @@ public class RecipeService {
         return recipeJdbcRepository.getAllRecipes();
     }
 
+    public List<Recipe> getRecipeByTitle(String searchText) {
+        return recipeJdbcRepository.getRecipeByTitle(searchText);
+    }
+
     public Recipe getRecipeById(int id) {
         return recipeJdbcRepository.getRecipeById(id);
     }

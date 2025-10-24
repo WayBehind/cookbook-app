@@ -24,7 +24,7 @@ class CookbookAppApplicationTests {
     private TestRestTemplate testRestTemplate;
 
     @Test
-    void getAll() {
+    void getAllRecipes() {
         final ResponseEntity<List<Recipe>> response = testRestTemplate.exchange(
                 "/api/recipes",
                 HttpMethod.GET,
@@ -58,6 +58,55 @@ class CookbookAppApplicationTests {
         assertEquals(request.getTitle(), response.getBody().getTitle());
         assertEquals(request.getDescription(), response.getBody().getDescription());
         assertEquals(request.getPrepTimeMinutes(), response.getBody().getPrepTimeMinutes());
+    }
+
+    @Test
+    void getRecipeByTitleIgnoreCase() {
+        final CreateRecipeRequest createDummyRecipeRequest1 = new CreateRecipeRequest(
+                "Food",
+                "Dummy Description 1",
+                11
+        );
+
+        final ResponseEntity<Recipe> createDummyRecipeResponse1 = testRestTemplate.postForEntity(
+                "/api/recipes",
+                createDummyRecipeRequest1,
+                Recipe.class
+        );
+
+        final CreateRecipeRequest createDummyRecipeRequest2 = new CreateRecipeRequest(
+                "Foot",
+                "Dummy Description 2",
+                12
+        );
+
+        final ResponseEntity<Recipe> createDummyRecipeResponse2 = testRestTemplate.postForEntity(
+                "/api/recipes",
+                createDummyRecipeRequest2,
+                Recipe.class
+        );
+
+        assertEquals(HttpStatus.CREATED, createDummyRecipeResponse1.getStatusCode());
+        assertNotNull(createDummyRecipeResponse1.getBody());
+
+        assertEquals(HttpStatus.CREATED, createDummyRecipeResponse2.getStatusCode());
+        assertNotNull(createDummyRecipeResponse2.getBody());
+
+        final ResponseEntity<List<Recipe>> getRecipeByTitleResponse = testRestTemplate.exchange(
+                "/api/recipes?searchText=FOO",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        assertEquals(HttpStatus.OK, getRecipeByTitleResponse.getStatusCode());
+        assertNotNull(getRecipeByTitleResponse.getBody());
+        assertEquals(2, getRecipeByTitleResponse.getBody().size());
+        assertTrue(getRecipeByTitleResponse.getBody().stream().anyMatch(response -> response.getTitle().equals(createDummyRecipeRequest1.getTitle())));
+        assertTrue(getRecipeByTitleResponse.getBody().stream().anyMatch(response -> response.getTitle().equals(createDummyRecipeRequest2.getTitle())));
+
+
     }
 
     @Test
