@@ -20,8 +20,8 @@ import java.util.List;
 public class RecipeJdbcRepository {
     private static final Logger logger = LoggerFactory.getLogger(RecipeJdbcRepository.class);
 
-    private static final String GET_ALL = "SELECT * FROM recipe";
-    private static final String GET_BY_TITLE = "SELECT * FROM recipe WHERE LOWER(title) LIKE LOWER(?) ORDER BY created_at DESC";
+    /*private static final String GET_ALL = "SELECT * FROM recipe";*/
+    private static final String GET_ALL_BY_TITLE = "SELECT * FROM recipe WHERE LOWER(title) LIKE LOWER(?) ORDER BY created_at DESC";
     private static final String GET_BY_ID = "SELECT * FROM recipe WHERE id = ?";
     private static final String CREATE = "INSERT INTO recipe (title, description, prep_time_minutes) VALUES (?, ?, ?)";
     private static final String UPDATE = "UPDATE recipe SET title = ?, description = ?, prep_time_minutes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
@@ -35,15 +35,9 @@ public class RecipeJdbcRepository {
         this.recipeRowMapper = recipeRowMapper;
     }
 
-    public List<Recipe> getAllRecipes() {
-        logger.debug("Getting all recipes");
-        return jdbcTemplate.query(GET_ALL, recipeRowMapper);
-
-    }
-
-    public List<Recipe> getRecipeByTitle(String searchText) {
+    public List<Recipe> getAllRecipesByTitle(String searchText) {
         logger.debug("Getting recipes with title: {}", searchText);
-        return jdbcTemplate.query(GET_BY_TITLE, recipeRowMapper, "%" + searchText + "%");
+        return jdbcTemplate.query(GET_ALL_BY_TITLE, recipeRowMapper, "%" + searchText + "%");
 
     }
 

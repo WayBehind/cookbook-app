@@ -19,20 +19,15 @@ public class RecipeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Recipe>> getAllRecipes() {
-        return ResponseEntity.ok(recipeService.getAllRecipes());
+    public ResponseEntity<List<Recipe>> getAllRecipesByTitle(
+            @RequestParam(required = false, defaultValue = "") String searchText
+    ) {
+        return ResponseEntity.ok(recipeService.getAllRecipesByTitle(searchText));
     }
 
     @GetMapping("{id}")
     public ResponseEntity<Recipe> getRecipeById(@PathVariable int id) {
         return ResponseEntity.ok(recipeService.getRecipeById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Recipe>> getRecipeByTitle(
-            @RequestParam(required = false, defaultValue = "") String searchText
-    ) {
-        return ResponseEntity.ok(recipeService.getRecipeByTitle(searchText));
     }
 
     @PostMapping

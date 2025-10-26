@@ -15,12 +15,8 @@ public class RecipeService {
         this.recipeJdbcRepository = recipeJdbcRepository;
     }
 
-    public List<Recipe> getAllRecipes() {
-        return recipeJdbcRepository.getAllRecipes();
-    }
-
-    public List<Recipe> getRecipeByTitle(String searchText) {
-        return recipeJdbcRepository.getRecipeByTitle(searchText);
+    public List<Recipe> getAllRecipesByTitle(String searchText) {
+        return recipeJdbcRepository.getAllRecipesByTitle(searchText);
     }
 
     public Recipe getRecipeById(int id) {
