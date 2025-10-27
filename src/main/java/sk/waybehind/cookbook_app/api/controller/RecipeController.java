@@ -1,4 +1,4 @@
-package sk.waybehind.cookbook_app.implementation.jdbc.controller;
+package sk.waybehind.cookbook_app.api.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
